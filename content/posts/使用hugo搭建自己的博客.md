@@ -1,7 +1,7 @@
 +++
 title = '使用hugo和github pages来搭建自己的博客'
 date = 2024-02-22T00:22:52+08:00
-draft = true
+draft = false
 toc = true
 +++
 
