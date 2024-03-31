@@ -7,6 +7,7 @@ categories = ['Golang']
 +++
 
 最近项目中用到了go workspace，以前就知道这个，不过没怎么研究过，现在来记录下go workspace的使用。
+<!--more-->
 
 go workspace是go语言中管理多个项目的一种方式。go workspace包含一个或多个go module,每个module都有自己的代码和依赖。我这个项目中使用go workspace的原因是项目A用到了我们组自己的项目B，如果不用workspace则项目A的开发每次都需要项目B的正式发版才能用最新的项目B中的代码，但是用worksapce就可以将开发中的项目B的代码作为本地代码来让项目A用，非常方便（在go.mod中使用replace将远程的repo替换为本地repo的路径也可以，但是没有go workspace方便）。
 
@@ -54,7 +55,12 @@ require (
     ......
 )
 ```
-go.work 不需要提交到 Git 中，因为它只是你本地开发使用的。当repoB开发完成，应该先提交其到远程仓库，然后在repoA中执行 `go get -u github.com/f91og/repoB`，然后禁用 workspace（通过 GOWORK=off 禁用），再次运行 repoA 模块来最终测试更新后的远程仓库repoB中的代码是否正确。
+go.work 不需要提交到 Git 中，因为它只是你本地开发使用的。当repoB开发完成，应该先提交其到远程仓库，然后在repoA中执行 `go get -u github.com/f91og/repoB`，然后禁用 workspace（export GOWORK=off 或者 GOWORK=off go run main.go ），再次运行 repoA 模块来最终测试更新后的远程仓库repoB中的代码是否正确。
+
+## 在vscode中使用go workspace
+最新的vscode的go插件已经支持了go workspace，点击在编辑go代码时状态栏出现的那个go版本就可以跳出 `open go.work` 的弹窗，然后可以直接编辑
+![](/images/image.png)
+
 
 虽然不清楚go workspace的底层是怎么实现的，但是估计是让go在寻找依赖时，优先去查找本地的吧。
 

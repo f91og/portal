@@ -1,4 +1,13 @@
 baseURL = 'https://f91og.github.io/'
-languageCode = 'en-us'
-title = '学のportal'
+title = 'f91ogの博客'
 theme = 'maupassant'
+googleAnalytics = "GA ID"
+defaultContentLanguage = "zh-hans"
+# defaultContentLanguageInSubdir = true # 多语言支持，开启了后可以通过 /zh/ 或 /en/ 访问不同语言版本
+
+[params]
+  subtitle = 'Get Things Done!'
+  localSearch = true
+  busuanzi = true
+  [params.contact]
+    email = 'yuxuef91og@gmail.com'
