@@ -57,11 +57,14 @@ defaultContentLanguage = "zh-hans"
 浏览器调试里那些被划横线的样式说明被其他样式覆盖了，[使用chrome调试工具解决问题（一） - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/624465440)
 
 调整完成后又有新的问题，这个主题的默认样式左侧栏空间太小了，最好是把目录给移到右下方。
-```css
 
-```
+然后需要用本地 `theme folder` 来替换 `git submodule`，要不然还得fork原主题提交修改才行，很麻烦。
+1. 在博客根目录里的 `.git/config` 里删除 `submodule` 的相关配置
+2. 删除 `.gitmodules` 文件
+3. `git add themes` 将主题文件夹添加到本地仓库
+
 ## 5. 让首页显示简短摘要
-使用 `maupassant` 主题时，在摘要后面加上这个 `<!--more-->`
+使用 `maupassant` 主题时，在要作为摘要的内容的后面加上这个 `<!--more-->`
 
 ## 6. 自定义域名
 最后买个域名替换下github page的域名就可以了，.com的域名一个也不是很贵
