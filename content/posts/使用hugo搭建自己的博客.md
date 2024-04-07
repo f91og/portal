@@ -41,7 +41,7 @@ defaultContentLanguage = "zh-hans"
 但是这样目录就直接没标题了，反而更好。
 
 **目录文本长度过长不能完全显示：**  
-这个就有点麻烦了，貌似需要改主题的 `css`，而且需要知道这种更改怎么能够在远程 `github` 仓库里生效。
+这个就有点麻烦了，貌似需要改主题的 `css`
 找到主题目录下的 `static/layouts/partials/toc.html` 文件，修改其中的 `.post-toc-content` 样式，修改完了 `hugo server -D` 会自动sync，不需要任何重启或者刷新浏览器。
 ```css
 ...
@@ -58,7 +58,7 @@ defaultContentLanguage = "zh-hans"
 
 调整完成后又有新的问题，这个主题的默认样式左侧栏空间太小了，最好是把目录给移到右下方。
 
-然后需要用本地 `theme folder` 来替换 `git submodule`，要不然还得fork原主题提交修改才行，很麻烦。
+然后需要用本地 `theme` 文件夹来替换 `git submodule`，要不然还得fork原主题提交修改才行，很麻烦。
 1. 在博客根目录里的 `.git/config` 里删除 `submodule` 的相关配置
 2. 删除 `.gitmodules` 文件
 3. `git add themes` 将主题文件夹添加到本地仓库

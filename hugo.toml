@@ -1,4 +1,4 @@
-baseURL = 'https://f91og.github.io/'
+baseURL = 'http://f91og.com/'
 title = 'f91ogの博客'
 theme = 'maupassant'
 googleAnalytics = "GA ID"
