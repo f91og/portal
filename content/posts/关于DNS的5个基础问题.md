@@ -1,9 +1,9 @@
 +++
-title = '关于DNS的6个疑问'
+title = '关于DNS的5个基础问题'
 date = 2024-05-01
 draft = false
-toc = true
-tags = [‘DNS’, 'Network']
+toc = false
+tags = ['DNS', 'Network']
 categories = ['Infrastructure']
 +++
 
@@ -12,11 +12,11 @@ categories = ['Infrastructure']
 
 ## 1. DNS配置的基本作用
 将域名映射为一个ip地址，或将域名映射为另一域名等等，让浏览器访问域名时能够正确的访问到服务器的ip地址，当然还有别的一些用法。
-基本工作原理就是当本地找不到域名的ip映射时，去请求域名解析服务器，拿到域名的ip。
+基本工作原理就是当本地找不到域名的ip映射时，去请求域名解析服务器（DNS服务器），拿到域名的ip。
 
 ## 2. Linux上DNS如何配置
 注意这里的配置是一般机器上的配置，不是DNS服务器的配置。
-有2个配置，一个配置域名解析服务器的ip，另一个是本地 DNS 解析记录的配置。
+有2个配置，一个配置DNS服务器的ip，另一个是本地 DNS 解析记录的配置。
 
 域名解析服务器的ip配置在 `/etc/resolv.conf` 里
 ```sh
@@ -32,7 +32,7 @@ options edns0
 search .
 ```
 
-本地 DNS 解析记录的配置在 `/etc/hosts` 里，当域名的ip不在这里时就会向DNS服务器请求域名的ip
+本地 DNS 解析记录的配置在 `/etc/hosts` 里，当请求的域名的ip不在这里时就会向DNS服务器请求域名的ip
 ```sh
 # vi /etc/hosts
 
@@ -44,7 +44,7 @@ ff02::2         ip6-allrouters
 ```
 
 ## 3. CNAME，A，TXT记录是什么
-首先明确一点这些都是在**域名解析服务器**（DNS 服务器）上配置的，而不是在本地主机上的 `/etc/hosts` 文件中配置的。
+首先明确一点这些都是在**域名解析服务器**（DNS 服务器）上配置的，而不是在一般主机上的 `/etc/hosts` 文件中配置的。
 
 CNAME（Canonical Name Record），真实名称记录，**是域名系统（DNS）的一种记录**。 CNAME记录用于将一个域名（同名）映射到另一个域名（真实名称），域名解析服务器遇到CNAME记录会以映射到的目标重新开始查询。 这对于需要在同一个IP地址上运行多个服务的情况来说非常方便。
 
