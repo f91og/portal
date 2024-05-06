@@ -69,13 +69,13 @@ defaultContentLanguage = "zh-hans"
 这步折腾了一会儿，搞不定时不要瞎尝试，要仔细思考各种可能行并且阅读官方文档，从弄懂基本的原理开始。
 
 **购买域名并配置**
-在nameslio上买了个域名，按照 github pages 的官方文档的说明，在nameslio上配置dns，添加一个CNAME记录，将自己的域名和 user.github.io 对应起来，**并且A记录也要按照文档上说的来添加**，否则会custom domain检查的时候会报 `Domain does not resolve to the GitHub Pages server` 错误，被这个坑惨了。
+在nameslio上买了个域名，按照 github pages 的官方文档的说明，在nameslio上配置dns，添加一个CNAME记录，将自己的域名和 user.github.io 对应起来，**并且A记录也要按照文档上说的来添加**，否则custom domain检查的时候会报 `Domain does not resolve to the GitHub Pages server` 错误，被这个坑惨了。
 
-**github pages的配置**
+**github pages的配置**  
 在自己的静态网站的 github repo 页面的 Setting 中的 Pages 里配置 Custom domain（注：需要先在 Build and deployment 里选择 Github Actions 然后才会出现Custom domain选项，将带www子域名的完整域名填入custom domain里）
 [管理 GitHub Pages 站点的自定义域 - GitHub 文档](https://docs.github.com/zh/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site#about-custom-domain-configuration)
 
-**Domain does not resolve to the GitHub Pages server**
+**Domain does not resolve to the GitHub Pages server**  
 配置完成后总是有这个问题，捣鼓了半天解决不了，原来是A record和CNAME record都要配置才可以，我真的是裂开。
 [dns - How to fix: Domain does not resolve to the GitHub Pages server. Error in Github Pages for custom domain setup with Enforce HTTPS Enabled? - Stack Overflow](https://stackoverflow.com/questions/54059217/how-to-fix-domain-does-not-resolve-to-the-github-pages-server-error-in-github)
 
