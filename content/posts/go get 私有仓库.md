@@ -1,5 +1,5 @@
 +++
-title = 'go中如何使用私有仓库'
+title = 'go get 私有仓库'
 date = 2024-05-21
 draft = false
 toc = false
@@ -30,11 +30,11 @@ bitbucket连接没问题后，可以配置 `gitconfig` ，自动将https的clone
 	insteadOf = https://git.my-company.com/
 ```
 
-下一步是要设置 `GOPRIVATE` 这个环境变量：
+最后就是要配置 `GOPRIVATE` 这个环境变量：
 ```shell
 export GOPRIVATE="git.my-company.com"
 ```
 
 最后在需要使用私有repo的 module 中执行 `go get git.my-company.com/repoA` ` 就可以了。
 
-当然使用 go workspace 也可以实现这个需求而且更加方便。
+当然使用 go workspace 也可以实现在自己的项目中使用私有仓库，而且更加简单方便。
