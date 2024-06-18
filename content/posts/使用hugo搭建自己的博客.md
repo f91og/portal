@@ -71,7 +71,7 @@ markdown 换行有点麻烦，普通段落想要换行的话直接敲回车是�
 ## 7. 自定义域名
 这步折腾了一会儿，搞不定时不要瞎尝试，要仔细思考各种可能行并且阅读官方文档，从弄懂基本的原理开始。
 
-**购买域名并配置**
+**购买域名并配置**  
 在nameslio上买了个域名，按照 github pages 的官方文档的说明，在nameslio上配置dns，添加一个CNAME记录，将自己的域名和 user.github.io 对应起来，**并且A记录也要按照文档上说的来添加**，否则custom domain检查的时候会报 `Domain does not resolve to the GitHub Pages server` 错误，被这个坑惨了。
 
 **github pages的配置**  

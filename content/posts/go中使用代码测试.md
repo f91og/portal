@@ -80,7 +80,7 @@ func TestAdd2(t *testing.T) {
 ```
 
 关于 go 自带的测试包 testing的用法，可以参考官方文档，提供了一系列方法用于不同的测试需求。
-## 3. 指定测试 case
+## 3. 指定运行的 test case
 直接运行`go test` 会运行当前包下所有的test case，有的时候我们只想运行某个包下的 test cases 或者某个特定的test case.
 
 **指定运行某个包下面的test**
