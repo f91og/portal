@@ -10,24 +10,34 @@ categories = ['Golang']
 最近还是想把笔记上的东西弄到博客，一是在网上分享有成就感，二是也方便自己参考，记录下博客的搭建过程，基本上照着hugo的官方文档来就可以，不需要看些参差不齐的博客浪费时间。 
 <!--more-->
 
-## 1. hugo的安装，基本使用，命令
+## 1. hugo的安装和基本使用
 看这里：https://gohugo.io/getting-started/quick-start/
 ```shell
-# create a new pst
+# mac上安装hugo
+brew install hugo
+
+# 创建自己的博客项目目录，确保之前本地已经安装好了Git
+hugo new site myblogs
+cd myblogs
+git init
+
+# 使用hugo命令来新建一篇博文，自己手动在posts目录下新建一个markdown文件也可以
 hugo new content posts/new-blog.md 
 
 # create a new blog directory, no need to create dir first, hugo will automatically create
 hugo new content posts/new-blog/index.md 
-```
 
+# 在本地实时预览博客效果，会自动sync修改
+hugo server -D
+```
 ## 2. 部署到github page并用github action来自动部署
 看这里：https://gohugo.io/hosting-and-deployment/hosting-on-github/
 
 ## 3. 处理博文中有本地图片的情况
-把图片放到static文件夹下，然后在博文中引用static目录下的图片文件的路径, eg: `![](/images/example.png)`
+把图片放到博客目录中的`static`目录下，然后在博文中引用`static`目录下图片文件的路径, eg: `![](/images/example.png)`
 ![](/images/example.png)
 
-第二种方式是在`content/posts`目录下创建一个文件夹，在里面创建`index.md`文件，把博客内容放到里面，然后把图片文件也放到这个文件夹下，在博客里直接相对路径引用这个图片就可以了。
+第二种方式是在`content/posts`目录下创建一个目录单独用于一篇博文，在里面创建`index.md`文件作作为博文内容，把图片文件也放到这个目录下，在`index.md`里直接相对路径引用这个图片就可以了。
 https://stackoverflow.com/questions/71501256/how-to-insert-an-image-in-my-post-on-hugo
 
 ## 4. 解决目录多语言不匹配和文本不完全显示
@@ -57,10 +67,10 @@ defaultContentLanguage = "zh-hans"
 
 调整完成后又有新的问题，这个主题的默认样式左侧栏空间太小了，最好是把目录给移到右下方。
 
-然后需要用本地 `theme` 文件夹来替换 `git submodule`，要不然还得fork原主题提交修改才行，很麻烦。
+最后就是将本地的 `theme` 目录来替换 `git submodule`，否则需要fork原主题git仓库提交修改后才能让改动的样式生效，很麻烦。
 1. 在博客根目录里的 `.git/config` 里删除 `submodule` 的相关配置
 2. 删除 `.gitmodules` 文件
-3. `git add themes` 将主题文件夹添加到本地仓库
+3. `git add themes` 将本地的 `theme` 目录托管到 git
 
 ## 5. 让首页显示简短摘要
 使用 `maupassant` 主题时，在要作为摘要的内容的后面加上这个 `<!--more-->`
