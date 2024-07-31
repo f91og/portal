@@ -6,7 +6,7 @@ defaultContentLanguage = "zh-hans"
 # defaultContentLanguageInSubdir = true # 多语言支持，开启了后可以通过 /zh/ 或 /en/ 访问不同语言版本
 
 [params]
-  subtitle = 'Get Things Done!'
+  subtitle = '万物は、天にあるものも地にあるもののも、見えるものも見えないものも、位も、主権も、支配も、権威も、すべで御子の中で創造されたからです'
   localSearch = true
   busuanzi = true
   [params.contact]
