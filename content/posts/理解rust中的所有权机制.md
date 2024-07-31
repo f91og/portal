@@ -1,6 +1,6 @@
 +++
 title = '理解rust中的所有权机制'
-date = 2024-08-01
+date = 2024-07-31
 draft = false
 toc = false
 tags = ['rust', '难点分析']
