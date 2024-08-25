@@ -7,7 +7,7 @@ tags = ['go']
 categories = ['Golang']
 +++
 
-最近开发中需要使用公司自己的bitbucket仓库，现在记录下如何使用。
+最近开发中需要使用公司自己的bitbucket仓库，直接 go get 报错，还是要设置一些东西。
 
 <!--more-->
 

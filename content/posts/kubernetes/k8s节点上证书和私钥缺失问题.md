@@ -2,11 +2,11 @@
 title = 'k8s节点上证书缺失问题'
 date = 2024-05-15
 draft = false
-tags = ['kubernetes', 'security']
-categories = ['Infrastructure']
+tags = ['k8s', 'security']
+categories = ['Kubernetes']
 +++
 
-最近遇到一堆node not ready都和证书有关，不知道为什么工作节点的私钥和证书就没有了，kubelet启动失败，现在研究下如何手动生成这些证书。
+最近遇到一堆node not ready都和证书有关，不知道为什么工作节点的私钥和证书就没有了，kubelet启动失败。
 
 <!--more-->
 

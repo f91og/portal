@@ -4,7 +4,7 @@ date = 2024-06-02
 draft = false
 toc = true
 tags = ['test', 'go']
-categories = ['Golang', 'Development']
+categories = ['Golang']
 +++
 
 代码测试在开发中是非常重要的一环，做好代码的单元测试可以避免每次提交代码时去测试整个应用。go 中的代码测试主要用 go 自带的 testing 包，以及那个第三方的 testify 包。
@@ -55,7 +55,7 @@ func TestAdd1(t *testing.T) {
 	}
 }
 
-// 先设置一些列的 test case 然后一起测试
+// 先设置一些 test case 然后一起测试
 func TestAdd2(t *testing.T) {
     tests := []struct {
         name     string
