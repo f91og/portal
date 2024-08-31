@@ -51,7 +51,7 @@ defaultContentLanguage = "zh-hans"
 
 **目录文本长度过长不能完全显示：**  
 这个就有点麻烦了，貌似需要改主题的 `css`
-找到主题目录下的 `static/layouts/partials/toc.html` 文件，修改其中的 `.post-toc-content` 样式，修改完了 `hugo server -D` 会自动sync，不需要任何重启或者刷新浏览器。
+找到主题目录下的 `themes/maupassant/layouts/partials/toc.html` 文件，修改其中的 `.post-toc-content` 样式，修改完了 `hugo server -D` 会自动sync，不需要任何重启或者刷新浏览器。
 ```css
 ...
     .post-toc .post-toc-content {
@@ -78,7 +78,21 @@ defaultContentLanguage = "zh-hans"
 ## 6. 换行问题
 markdown 换行有点麻烦，普通段落想要换行的话直接敲回车是没有用的，连续输入2个空格可以换行，但是这个以代码段结尾没有用，可以输入**一个**反斜杠符号 \\ 来解决这个问题。
 
-## 7. 自定义域名
+## 7. 缩小无序列表的默认开始行距
+默认的项目列表的开始行间距太大了，可以修改 `themes/maupassant/static/css/style.css` 文件，将无序列表的 `margin-top` 设置为负值：
+```css
+.post-content ul {
+    overflow: auto;
+    padding: .5em 2.4em;
+    border-radius: 3px;
+    margin-bottom:1.8em;
+    margin-top: -1em;
+    margin-left: 0;
+    margin-right: 0;
+}
+```
+
+## 8. 自定义域名
 这步折腾了一会儿，搞不定时不要瞎尝试，要仔细思考各种可能行并且阅读官方文档，从弄懂基本的原理开始。
 
 **购买域名并配置**  
