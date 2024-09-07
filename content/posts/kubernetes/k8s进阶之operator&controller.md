@@ -1,5 +1,5 @@
 +++
-title = 'k8s进阶之operator&controller'
+title = 'k8s进阶之 operator&controller'
 date = 2024-09-07T06:32:46Z
 draft = false
 tags = ['k8s']

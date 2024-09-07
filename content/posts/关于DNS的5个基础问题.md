@@ -3,7 +3,7 @@ title = '关于DNS的5个基础问题'
 date = 2024-05-01
 draft = false
 toc = false
-tags = ['DNS', 'Network']
+tags = ['network', 'dns']
 categories = ['Infrastructure']
 +++
 
