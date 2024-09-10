@@ -43,7 +43,7 @@ fn main() {
 }
 ```
 \
-可以使用引用来获得多个读权限，一写多读不会产生数据竞争问题。使用 `&` 来创建拥有所有权变量的 **引用**，这个创建引用的行为叫做 **借用**。
+可以使用引用来获得多个读权限，使用 `&` 来创建拥有所有权变量的 **引用**，这个创建引用的行为叫做 **借用**。
 ```rust
 fn main() {
     let s1 = String::from("hello");
@@ -168,7 +168,7 @@ fn use_string_by_refer(s: &str) {
 }
 ```
 \
-另一个要理解的是集合类型变量和结构体的所有权，在 Rust 中，集合类型变量和结构体类似，外部只能使用其引用来访问和修改其内部内容，集合变量拥有其内部所有成员的所有权。
+另一个要理解的是集合类型变量和结构体的所有权，在 Rust 中，集合类型变量和结构体类似，外部只能使用其引用来访问和修改其内部内容，集合类变量和结构体拥有其内部所有成员的所有权。
 ```rust
 use std::collections::HashMap;
 
@@ -265,7 +265,7 @@ fn main() {
 }
 ```
 \
-接下来是一个和所有权机制有关的错误的分析  
+接下来是一个和所有权机制有关的错误分析  
 这个错误真的非常奇怪，App里有2个方法，switch_mode 和 add_secret, 使用其中一个会报错而另一个则不会，这里奇怪的地方在于我觉得这个2个方法在 &mut self 这里是一样的，所以应该会同时报错或者同时不报错。  
 `app.rs`
 ```rust
@@ -374,7 +374,7 @@ error[E0499]: cannot borrow `*app` as mutable more than once at a time
 在43行报错的原因是因为用到了 `name.to_string()` 而 name 是对 first mutable borrow 处panel 的引用（也就是23行第一个对app的引用），而这里的  app.add_secret() 这里又用到了一个app的引用（可以将每次调用app.xxx 方法作为对app的一次引用）从而产生了冲突。
 而 `app.switch_mode(Mode::Normal)` 没有错误则是因为没有用到 name，编译器判断23行的第一个app的引用被释放了。
 
-解决方法就是在 `app.add_secret` 之前使用 name.to_string()，复制name得到一个新的拥有所权的变量，让编译器判断到 `app.add_secret` 这行的时候第一个引用已经失效，从而避免引用冲突。
+解决方法就是在 `app.add_secret` 之前使用 name.to_string()，复制name得到一个新的拥有所权的变量，让编译器判断到 `app.add_secret` 这行的时候第一个引用已经失效，从而避免冲突。
 ```rust
 	let name = name.to_string();
 	app.add_secret(name, value);

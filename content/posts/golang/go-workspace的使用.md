@@ -2,7 +2,7 @@
 title = 'Go Workspace的使用'
 date = 2024-02-28T14:58:32+09:00
 draft = false
-tags = ['go', '依赖管理']
+tags = ['go']
 categories = ['Golang']
 +++
 

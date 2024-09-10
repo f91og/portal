@@ -6,7 +6,7 @@ tags = ['k8s']
 categories = ['Kubernetes']
 +++
 
-Operator 是一种自动化模式的概念，而 Controller 是执行这一模式的实际工具。
+Operator 是一种自动化模式的概念，实际干活的还是 Controller 的那些pods。
 
 <!--more-->
 ## operator和controller简介
@@ -16,7 +16,7 @@ operator 和 controller 这2个概念经常在 k8s 中一起听到，可以简�
 就实际层面来说 controller 就是 pod，让其来 watch 资源的现有状态，并通过 reconcile 将这些资源变成期望的状态，从而达到自动运维的效果。
 
 现在公司的一个使用场景是当一个新的tenant来使用我们的platform，创建 tenanat 的 namespace的时候，我们希望相关的 k8s 资源（resourcequota, rbac, pdb等）能够自动被创建，并且可以触发 jenkins job 来设置 tenant 的 pipeline, slack channel 等。
-## 开发 controller
+## 开发 operator
 一般会使用 [operator-sdk](https://github.com/operator-framework/operator-sdk) 这个框架来开发 k8s operator，接下来我们用这个框架来创建一个非常简单的 operator，当crd MyNamespace被创建的时候，自动创建同名的 namesapce 并在这个 namespace 下面创建默认的 resourcequota。
 
 **安装 Operator SDK**
