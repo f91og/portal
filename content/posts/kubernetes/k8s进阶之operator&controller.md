@@ -9,7 +9,7 @@ categories = ['Kubernetes']
 Operator 是一种自动化模式的概念，实际干活的还是 Controller 的那些pods。
 
 <!--more-->
-## operator和controller简介
+## operator 和 controller 简介
 
 operator 和 controller 这2个概念经常在 k8s 中一起听到，可以简单的理解为 operator 是一种对如何管理复杂应用的生命周期的抽象，类似于一套理论来阐述如何编排容器，而 controller 就是实际执行管理操作的“工人”，类似于容器编排工具中的 k8s。
 
@@ -17,7 +17,7 @@ operator 和 controller 这2个概念经常在 k8s 中一起听到，可以简�
 
 现在公司的一个使用场景是当一个新的tenant来使用我们的platform，创建 tenanat 的 namespace的时候，我们希望相关的 k8s 资源（resourcequota, rbac, pdb等）能够自动被创建，并且可以触发 jenkins job 来设置 tenant 的 pipeline, slack channel 等。
 ## 开发 operator
-一般会使用 [operator-sdk](https://github.com/operator-framework/operator-sdk) 这个框架来开发 k8s operator，接下来我们用这个框架来创建一个非常简单的 operator，当crd MyNamespace被创建的时候，自动创建同名的 namesapce 并在这个 namespace 下面创建默认的 resourcequota。
+一般会使用 [operator-sdk](https://github.com/operator-framework/operator-sdk) 这个框架来开发 k8s operator，接下来我们用这个框架来创建一个非常简单的 operator，当 CRD 资源 MyNamespace 的 CR 被部署时，自动创建同名的 namespace 并在这个 namespace 下面创建默认的 resourcequota。
 
 **安装 Operator SDK**
 ```shell
@@ -40,45 +40,58 @@ operator-sdk create api --group mygroup --version v1 --kind MyNamespace --resour
 operator会自动生成 crd 的yaml 文件，不需要我们提前创建 crd 的 yaml 文件。
 上面的命令执行完成后命令行会提示用 `make manifests` 来生成 yaml 文件，如果想要修改crd，可以在 `api/v1/mynamespace_types.go` 文件中定义 crd 的结构：
 ```go
+package v1
+
+import (
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+)
+
+// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
+// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+
 // MyNamespaceSpec defines the desired state of MyNamespace
 type MyNamespaceSpec struct {
-    // 添加你需要的字段
-    DisplayName string `json:"displayName,omitempty"`
-    // 其他你想管理的字段
+	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+	// Important: Run "make" to regenerate code after modifying this file
+
+	// Foo is an example field of MyNamespace. Edit mynamespace_types.go to remove/update
+	Foo string `json:"foo,omitempty"`
 }
 
 // MyNamespaceStatus defines the observed state of MyNamespace
 type MyNamespaceStatus struct {
-    // 添加状态字段，例如创建状态
-    Phase string `json:"phase,omitempty"`
+	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
+	// Important: Run "make" to regenerate code after modifying this file
 }
 
-// +kubebuilder:object:root=true
-// +kubebuilder:subresource:status
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
 
 // MyNamespace is the Schema for the mynamespaces API
 type MyNamespace struct {
-    metav1.TypeMeta   `json:",inline"`
-    metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-    Spec   MyNamespaceSpec   `json:"spec,omitempty"`
-    Status MyNamespaceStatus `json:"status,omitempty"`
+	Spec   MyNamespaceSpec   `json:"spec,omitempty"`
+	Status MyNamespaceStatus `json:"status,omitempty"`
 }
 
-// +kubebuilder:object:root=true
+//+kubebuilder:object:root=true
 
 // MyNamespaceList contains a list of MyNamespace
 type MyNamespaceList struct {
-    metav1.TypeMeta `json:",inline"`
-    metav1.ListMeta `json:"metadata,omitempty"`
-    Items           []MyNamespace `json:"items"`
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []MyNamespace `json:"items"`
+}
+
+func init() {
+	SchemeBuilder.Register(&MyNamespace{}, &MyNamespaceList{})
 }
 ```
-然后来生成yaml并deploy：
+用 `make manifests` 来生成 CRD 的 yaml，然后部署 CRD:
 ```shell
 make manifests
-
-# 生成的yaml文件在目录下的config/crd/bases/中
 kubectl apply -f config/crd/bases/mygroup.example.com_mynamespaces.yaml
 ```
 \
