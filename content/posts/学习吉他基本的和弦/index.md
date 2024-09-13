@@ -86,7 +86,6 @@ ps: 记住键盘上所对应的音名是固定的，2个键的音程是半音（
 
 新手的八大常用吉他和弦：**C , A , G , E , D , Am , Em , Dm**，[吉他和弦：新手村的八大和弦 – 他，在旅行｜Guitar to go (guitartogo-music.com)](https://guitartogo-music.com/learning-essentials/first-eight-chords-for-beginners/?srsltid=AfmBOor1-gwrcBZvTDuVaDqw6xrWsMXH9k2bUyniF1nfAaVZC-bKQpVU)
 ![](Pasted%20image%2020240831215825.png)
-
 一个疑问，既然音名是绝对音高，那么C和弦就是固定在 C，E，G？那如果要弹更高音的和弦，比如升2个C的，这种情况怎么办呢？虽然是我目前的推断，既然和弦是在一个八度内（C到A）的一组，那么如果乐谱中的音名是升C或者降C，那么和弦就应该移到相应的八度中去弹，而不需要在和弦的标记里添加多余的符号，问了 AI 好像也是这么回事。
 
 ## 赞美诗练习
@@ -117,5 +116,4 @@ ps: 记住键盘上所对应的音名是固定的，2个键的音程是半音（
 歌詞の内容に従って、弾けばなんとなくわかりますよ。”
 
 好吧，要弹和弦D一直到到A，ok，开始练习试试 💪。
-
-最后再吐槽下和弦真的是个对于初学者来说比较难的乐理论知识了。
+- D和弦比较难按，可以参考这个：[D和弦怎么按? 2弦不响?刮1弦?_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV18y4y1C7Vy/?vd_source=6e0c18349c9d2d60a1a7c15986b114e6)
