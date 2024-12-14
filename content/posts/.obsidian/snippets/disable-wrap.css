@@ -1,0 +1,10 @@
+/* 禁用编辑模式的自动换行 */
+.markdown-source-view {
+  white-space: nowrap;
+}
+/* 缩短编辑模式和阅读模式两边的页边距 */
+.markdown-preview-view, 
+.cm-s-obsidian {
+    padding-left: 5px; /* 调整左边距 */
+    padding-right: 5px; /* 调整右边距 */
+}
