@@ -2,6 +2,7 @@
 title = 'k8s 进阶之开发 admission webhook'
 date = 2024-12-25T10:56:38Z
 draft = false
+toc = true
 tags = ['k8s']
 categories = ['Kubernetes']
 +++
