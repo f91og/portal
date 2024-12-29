@@ -432,8 +432,7 @@ docker push f91org/simple-k8s-webhook
 
 webook 和 api server 是 https 通信，所以需要我们准备 webook 端的私钥以及签发它的证书，这里做法有 2 种：
 1. 用 k8s 集群的 CA，通过 `CertificateSigningRequest` 和 `kubectl certificate approve` 来签发证书。
-2. 使用 `openssl` 命令来生成自签发的 CA，区别于 k8s 集群的 CA，这种情况下需要在 `WebhookConfiguration` 里来配置自签发 CA 的证书。
-这里用第二种方法，即 openssl 来生成自签发 CA，用这个 CA 去签发证书。
+2. 使用 `openssl` 命令来生成自签发的 CA，区别于 k8s 集群的 CA，这种情况下需要在 `WebhookConfiguration` 里来配置自签发 CA 的证书。这里用这种方法生成 CA，用这个 CA 去签发证书。
 ```shell
 # 生成CA的证书和私钥
 openssl genrsa -out ca.key 2048
@@ -480,8 +479,7 @@ EOF
 
 ## 部署 yaml 文件
 
-然后是部署用的 yaml 文件，service, deployment, secret, sa, clusterrole, rolebinding 全套走起，以及 adminssionwebhook 需要用到的 2 个特殊的配置 ValidatingWebhookConfiguration，MutatingWebhookConfiguration
-deploy 和 svc：
+service, deployment, secret, sa, clusterrole, rolebinding 全套走起，以及 adminssionwebhook 需要用到的 2 个特殊的配置 ValidatingWebhookConfiguration，MutatingWebhookConfiguration
 ```yaml
 apiVersion: v1
 kind: Service
@@ -559,7 +557,7 @@ metadata:
   name: webhook-certs
 ```
 
-然后是权限相关配置，role -> rolebinding <- sa，这里为了方便直接给所有权限：
+权限相关的配置，role -> rolebinding <- sa，这里为了方便直接给所有权限：
 ```yaml
 # CluserRole
 apiVersion: rbac.authorization.k8s.io/v1
@@ -637,7 +635,7 @@ webhooks:
       - "my-webhook"
       operator: NotIn
   clientConfig:
-    caBundle: LS0tLS1CRUdJTiBDRVJU... # 太长省略
+    caBundle: LS0tLS1CRUdJTiBDRVJU... # cat ca.crt | base64
     service:
       name: my-webhook
       path: /validate

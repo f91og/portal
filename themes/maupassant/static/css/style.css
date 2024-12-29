@@ -106,9 +106,11 @@ pre {
 }
 code {
     display: inline-block;
+    white-space: pre; /* 或 pre-wrap，具体视需求 */
 }
 pre code {
-    text-wrap: wrap;
+    white-space: pre; /* 确保代码块不换行 */
+    overflow-x: auto; /* 添加水平滚动条 */
 }
 blockquote {
     display: block;
