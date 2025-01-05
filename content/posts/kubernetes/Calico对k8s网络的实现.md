@@ -2,8 +2,8 @@
 title = 'Calico 对 k8s 网络的实现'
 date = 2024-12-15T07:54:27Z
 draft = false
-tags = ['network','难点分析','calico']
-categories = ['Kubernetes']
+tags = ['network','难点分析','calico','k8s']
+categories = ['Infrastructure']
 +++
 
 Calico 是 k8s 常用的 cni 插件之一，部署简单而且性能还不错，主要实现的是 pod ip 分配， pod 到 pod 的通信，以及网络策略等。
@@ -144,6 +144,7 @@ dev-node2210z.dev.jp.local  100.73.172.44
 
 在另一个节点 nodeB 上确认路由信息
 ```shell
+# nodeB的ip
 # ip route | grep 192.168.161
 192.168.161.0/26 via 100.73.172.35 dev tunl0  proto bird onlink 
 192.168.161.64/26 via 100.73.172.44 dev tunl0  proto bird onlink 
@@ -169,10 +170,15 @@ blackhole 192.168.161.64/26  proto bird
 192.168.161.119 dev cali961628a8290  scope link 
 192.168.161.120 dev cali4edf734636c  scope link 
 ```
-`192.168.161.72` 走网卡 `cali5475d974730`，它连着容器端的网卡，这样 pod 到 pod 的路由就通了。
+podA 的 ip `192.168.161.72` 走网卡 `cali5475d974730`，它连着容器端的网卡，这样 pod 到 pod 的路由就通了。
 
-上面是同集群不同 node 的情形，还有一种情形是跨集群的 node 和 node 之间的路由，这个和 BGP 有关，有点复杂，有时间的话再来具体分析下，但不管怎样就实现层面来说都是 Calico 来负责维护路由信息，让从 pod 出来的数据包可以正确到达目的地。
-## 备注
+上面的 nodeA 和 nodeB 是在一个集群里中的同一个网络里，这样跨 node 不会走路由器，但是如果是集群中不同网络的情况又是怎样的呢？
+
+先来看同一集群但是不同网络的情况：
+
+然后是跨集群的情况：
+
+**备注**  
 尝试去另一个集群中看 calico 的情况，发现 calixxx 接口后面不是 docker0
 ```shell
 11: cali5d4370e6c12@if4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 8980 qdisc noqueue state UP mode DEFAULT group default qlen 1000
