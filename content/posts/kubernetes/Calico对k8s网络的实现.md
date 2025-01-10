@@ -47,6 +47,11 @@ calico-node                282       282       282     282          282         
 其中 calico-node 中有 2 个组件，他们的作用是：
 - **Felix**：Calico 的代理（Agent），负责配置 **iptables** 和 **路由表**，实现数据包的安全策略（Network Policy）和流量转发
 - **BIRD**：BGP 路由协议的实现，负责将节点的网络路由信息分发到其他节点，实现数据包跨节点通信
+
+Calico 提供了多种路由模式：
+1. **IPIP 模式（默认）**：Calico 会将 Pod 的 IP 流量封装成 IPIP 数据包，通过底层 Node 的 IP 地址来路由，虽然有性能损耗但是配置简单。
+2. **VXLAN 模式**：类似于 IPIP，但封装使用 VXLAN 协议。
+3. **BGP 模式（无封装）**：如果底层网络能够直接路由所有 Pod 的网段，Calico 就不需要封装流量，直接使用 BGP 动态更新路由信息
 ## pod 到宿主机的网络
 可以先看这个：[Calico 网络通信解析](https://www.ffutop.com/posts/2019-12-24-how-calico-works/)  
 首先在 pod 里看路由表信息：
@@ -120,12 +125,12 @@ Calico 会通过 veth pair 将宿主机的网卡和容器中的网卡连接，[2
 1
 ```
 可以看到所有 calixxx 网卡都开启了 `proxy_arp`，通过这个功能从 pod 中出发的数据包就可以到宿主机上对应的 calico 网卡了。
-## 跨 node 时的网络流程
-当 pod 去访问同集群或者不同集群中另一个 node 上 pod 的时候，因为要知道目标 node 的 ip 以及目标 pod 的 ip，基本实现方法有 2 种：
-1. 包裹原数据包，从 pod 出来的数据包目的 ip 只有目的 pod 的 ip 所以要在这数据包中加入源 node 和目的 node 的 ip，接收端要做额外解析，有一定的资源消耗（Flannel 的做法）。
-2. **直接路由实现（不需要包裹数据包）**，在这种方法中，**Pod 到 Pod 的通信通过直接路由的方式实现**，数据包不会被额外封装（不需要额外的 encapsulation），而是基于主机的路由表或者 BGP（边界网关协议）来完成路由。目标 Node 和目标 Pod 的 IP 都是可以直接路由的。
+## pod 到 pod 的网络
+k8s 集群中 pod 之间的通信需要知道 node 的 ip 和 pod 的 ip，实现方法有 2 种：
+1. 包裹原数据包，从 pod 出来的数据包只有目的 pod 的 ip， 所以要在数据包中加入源 node 和目的 node 的 ip，接收端要做额外解析，有一定的资源消耗（Flannel 的做法）。
+2. **直接路由实现（不需要包裹数据包）**，在这种方法中，**Pod 到 Pod 的通信通过直接路由的方式实现**，数据包不会被额外封装，而是基于主机的路由表或者 BGP（边界网关协议）来完成路由，目标 Node 和目标 Pod 的 IP 都是可以直接路由的。
 
-Calico 采用了 **第二种方法**，通过 **原生路由机制** 实现 Pod 到 Pod 的通信，主要有以下特点：
+Calico 实现了以上 2 种方式，可以通过 **原生路由机制** 实现 Pod 到 Pod 的通信，主要有以下特点：
 1. **BGP（边界网关协议）**：  
     每个节点（Node）运行一个 BGP 客户端（如 BIRD），通过 BGP 协议将 Pod 的网络前缀（子网范围）通告给整个集群的路由表。这使得每个 Node 都知道其他 Node 上 Pod 网络的路由路径。
 2. **无需封装（No Encapsulation）**：  
@@ -136,54 +141,66 @@ Calico 采用了 **第二种方法**，通过 **原生路由机制** 实现 Pod 
     Calico 可以使用 Kubernetes API Server 作为配置数据存储，也可以使用 etcd 来存储网络策略和路由信息。
 Calico 的直接路由实现网络性能更高，尤其在大规模集群场景下更为高效，但需要配置和维护路由信息（通常借助 BGP）。
 
-可以在集群中验证下 Calico 的实现，先看下集群中 podA 的 ip 和 它的 node 的 ip:
+接下来去公司的集群里验证下 Calico 的实现。  
+看下集群中一个 node 的 ip 和这个 node 上运行的一个 pod 的 ip：
 ```shell
-busybox-6644b5988-6wsxw    192.168.161.72  dev-node2210z.dev.jp.local
-dev-node2210z.dev.jp.local  100.73.172.44
+node A ip:  100.119.66.41
+pod1 ip:   100.86.153.153
 ```
 
-在另一个节点 nodeB 上确认路由信息
+在另一个节点 node B 上查看路由信息
 ```shell
-# nodeB的ip
-# ip route | grep 192.168.161
-192.168.161.0/26 via 100.73.172.35 dev tunl0  proto bird onlink 
-192.168.161.64/26 via 100.73.172.44 dev tunl0  proto bird onlink 
-192.168.161.128/26 via 100.73.97.44 dev tunl0  proto bird onlink 
+# node B ip: 100.99.66.15 
+# ip route | grep 100.86.153
+100.86.153.128/27 via 100.119.66.41 dev tunl0 proto bird onlink 
+100.86.153.192/27 via 100.99.69.62 dev tunl0 proto bird onlink 
 ```
-根据网络范围判断可以知道 `192.168.161.72 ` 在 `192.168.161.64/26` 这个网段里，所以从 nodeB 上如果往 podA 发请求的话，就知道下一个路由目标是 `100.73.172.44`，即 podA 所在的 node 的 ip，再在 podA 的 node 上看路由信息：
+ node A 上的 pod1 的 `100.86.153.153` 在 `100.86.153.128/27` 这个网段里，node B 根据本机路由表的配置就知道往 pod1 的网络的下一个路由目标是 `100.119.66.41`，即 node A 的 ip，而在 node A 上的路由表 Calico 也配置了往 pod1 的路由是 `cali9cc5c053625`：
 ```shell
-# ip route | grep 192.168.161
-192.168.161.0/26 via 100.73.172.35 dev tunl0  proto bird onlink 
-blackhole 192.168.161.64/26  proto bird 
-192.168.161.65 dev caliba9951e9d21  scope link 
-192.168.161.72 dev cali5475d974730  scope link 
-192.168.161.79 dev cali700f1e4f8eb  scope link 
-192.168.161.82 dev cali61ec5cc43ec  scope link 
-192.168.161.83 dev cali4d7f87a2695  scope link 
-192.168.161.91 dev calib219a8a4cbc  scope link 
-192.168.161.96 dev cali1e08058e9d8  scope link 
-192.168.161.97 dev calie1d6b5012fb  scope link 
-192.168.161.104 dev cali20a7f22e20a  scope link 
-192.168.161.105 dev cali20fdce43e7b  scope link 
-192.168.161.106 dev cali724c82f2335  scope link 
-192.168.161.114 dev calice0461d0744  scope link 
-192.168.161.119 dev cali961628a8290  scope link 
-192.168.161.120 dev cali4edf734636c  scope link 
+# ip route | grep 100.86.153.153
+100.86.153.153 dev cali9cc5c053625 scope link 
 ```
-podA 的 ip `192.168.161.72` 走网卡 `cali5475d974730`，它连着容器端的网卡，这样 pod 到 pod 的路由就通了。
+`cali9cc5c053625` 连着容器端的网卡，从而将数据路由给了 pod1。  
+传输流程是： Pod-1 -> calixxx -> tunl0 -> eth0 <----> eth0 ->  tunl0 -> calixxx -> Pod-2 
 
-上面的 nodeA 和 nodeB 是在一个集群里中的同一个网络里，这样跨 node 不会走路由器，但是如果是集群中不同网络的情况又是怎样的呢？
+分析到这里突然的一个疑问是，关于 node 的 ip 分配是怎么做的？公司里的 node 的网络是通过使用 network team 创建的 subnet 来分配 ip 的，不是 calico 来分配的 ip，这属于是 k8s 集群范围外的事情，那么 calico 是怎么感知这种的 node ip 的变化从而维护整个路由信息的呢？在上面的 node A 和 node B 的 ip 地址分别是 ` 100.119.66.41` 和 `100.99.66.15`，属于是 2 个不同的 subnet，这种跨 subnet 的路由需要走路由器来中转吗？
+思考了下，我的回答是这样的：
+1. Node 的 IP 来源：calico 作为 cni 插件，负责的是分配 pod 的 ip，不是 node 的 ip，node 的 IP 是 Kubernetes 集群外部的事情（例如 DHCP、静态配置，或通过公司 Network Team 的分配）
+2. Node 的 IP 感知：Calico 通过 Kubernetes 的 API 自动发现 Node 的 IP 地址，从而维护全局的路由表。
+3. 同一集群中跨 subnet 访问：需要底层路由器支持，公司的扁平化网络肯定是一个数据中心内所有机器都通过交换机和路由互通的，网络限制通过软件层面（如 ACL）来做的，每次有新的 node 用新的 subnet 时，直接加入集群里就行了，不用考虑路由器设置问题（network team 在创建新的 network 时应该都已经弄好了）。
 
-先来看同一集群但是不同网络的情况：
-
-然后是跨集群的情况：
-
-**备注**  
-尝试去另一个集群中看 calico 的情况，发现 calixxx 接口后面不是 docker0
+给了 AI 看上面的路由信息：
+```
+100.86.153.128/27 via 100.119.66.41 dev tunl0 proto bird onlink 
+```
+AI 根据 `dev tunl0` 判断 Calico 是 IPIP 模式，但是从路由信息来看不是纯路由实现的么？应该是 BGP 模式（无封装）才对啊，有点混乱。  
+查看集群中的 calico 的工作模式：
 ```shell
-11: cali5d4370e6c12@if4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 8980 qdisc noqueue state UP mode DEFAULT group default qlen 1000
-    link/ether ***************** brd ***************** link-netns cni-************************************
-12: cali13c98071982@if4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 8980 qdisc noqueue state UP mode DEFAULT group default qlen 1000
-    link/ether ***************** brd ***************** link-netns cni-************************************
+calicoctl --allow-version-mismatch get ippool -o yaml
+apiVersion: projectcalico.org/v3
+items:
+- apiVersion: projectcalico.org/v3
+  kind: IPPool
+  metadata:
+    creationTimestamp: "2024-07-29T06:03:57Z"
+    name: default-ipv4-ippool
+    resourceVersion: "2330"
+    uid: a28320ff-d143-48a4-b6a0-91e37279a47a
+  spec:
+    allowedUses:
+    - Workload
+    - Tunnel
+    blockSize: 27
+    cidr: 100.86.0.0/16
+    ipipMode: Always
+    natOutgoing: true
+    nodeSelector: all()
+    vxlanMode: Never
+kind: IPPoolList
+metadata:
+  resourceVersion: "742363428"
 ```
-不知道是为啥，有时间的话再来研究研究下。
+可以看到 `ipipMode` 配置为了 Always，即的确是用 IPIP 模式.....，又是日常被 Ai 吊打的一天。
+
+参考：[calico配置步骤--IPIP模式vsBGP模式 - JaneySJ - 博客园](https://www.cnblogs.com/janeysj/p/14804986.html)
+
