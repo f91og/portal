@@ -443,10 +443,10 @@ type PVLabeler interface {
 	GetLabelsForVolume(ctx context.Context, pv *v1.PersistentVolume) (map[string]string, error)
 }
 ```
-通过实现以上的方法就可以定制我们自己的 node, lb, route, volume 的控制逻辑。
+通过实现以上的方法就可以定制云厂商自己的 node, lb, route, volume 的控制逻辑。
 
 现在组里通过 ccm 实现的是：
 - 自动给 lb 配置名字，规则为 `${CLUSTER_ID}-${NAMESPACE}-${SERVICE_NAME}`，lb 是 k8s 集群外的资源，和 lb svc 不同有自己的命名。
-- 通过在 lb svc 中加入注解自动配置 lb，但创建类型为 lb 的 svc 时，ccm 会读取 svc 中的注解，比如 `service.beta.kubernetes.io/dlb-listener-maxqps: "100000"`， 然后 call 专门管 lb 的 team 的 api 来修改负责均衡器的配置。
+- 通过在 lb svc 中加入注解自动配置 lb，但创建类型为 lb 的 svc 时，ccm 会读取 svc 中的注解，比如 `service.beta.kubernetes.io/dlb-listener-maxqps: "100000"`， 然后调用 lb  team 的 api 来修改负责均衡器的配置。
 - 自动配置负责均衡器的下游 server，通过给 node 添加注解让 k8s 集群中的一些 node 承接 ingress 流量 (ingress node)。
 - 设置路由，这个不太清楚怎么弄的，有时间可以研究一下。
