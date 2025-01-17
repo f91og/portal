@@ -6,7 +6,7 @@ tags = ['k8s']
 categories = ['Kubernetes']
 +++
 
-Cloud Controller Manager（CCM）是 Kubernetes 中控制平面的一个组件，专门用于与云服务提供商的基础设施交互，通过这个可以定制云厂商自己 node, lb svc, route 和 volume 的控制逻辑。
+集群里有些部分是 k8s 管理的范畴外，如 node 和 lb，对于这种依赖云厂商自己实现的资源，k8s 开放了控制平面组件 Cloud Controller Manager（CCM）来让云厂商定制自己 node, lb svc, route 和 volume 的控制逻辑。
 
 <!--more-->
 
