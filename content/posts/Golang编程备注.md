@@ -1,12 +1,12 @@
 +++
-title = 'Golang 编程踩坑记录'
+title = 'Golang 编程备注'
 date = 2024-11-24T09:04:10Z
 draft = false
 tags = ['go']
 categories = ['Golang']
 +++
 
-Go 是一门以简洁设计为原则的语言，虽说简洁，但坑也不少。
+Go 是一门以简洁设计为原则的语言，虽说简洁但因其语言特性有些地方还是要去注意一下的。
 
 <!--more-->
 
@@ -129,3 +129,39 @@ func main() {
     fmt.Println(mp2) // map[key:42]
 }
 ```
+
+## 将方法挂在结构体 vs 定义在包里
+在 Go 中一个方法可以被挂载载结构体上使用（这种被称为方法），也可以和结构体无关直接作为单独的函数定义在包中来通过包名来直接使用，有必要思考下这 2 种使用方式的不同以及适合的场景。
+
+方法和函数的使用方式：
+```go
+// 方法
+type MyStruct struct {
+    Name string
+}
+
+func (m *MyStruct) Greet() string {
+    return "Hello, " + m.Name
+}
+
+obj := MyStruct{Name: "Alice"}
+fmt.Println(obj.Greet())  // 调用方法
+
+// 函数
+package mypackage
+
+func Greet(name string) string {
+    return "Hello, " + name
+}
+
+import "mypackage"
+fmt.Println(mypackage.Greet("Alice"))  // 调用独立函数
+```
+
+**方法**：适合在结构体上定义与结构体行为相关的功能，尤其是当需要访问或修改结构体内部状态时。  
+**独立函数**：适合处理与特定结构体无关的通用功能，便于复用，适合没有状态管理需求的功能。
+
+## 通过导入 init 函数来初始化
+
+## 如何实现AOP类似的功能
+## 
