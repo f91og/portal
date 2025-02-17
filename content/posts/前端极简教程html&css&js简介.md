@@ -1,5 +1,5 @@
 +++
-title = '前端极简教程 html&css&js 基础'
+title = '前端极简教程 html&css&js 简介'
 date = 2025-02-17T12:53:20Z
 tags = ['frontend']
 categories = ['Frontend']
@@ -84,7 +84,7 @@ js，即 JavaScript 主要用于 **让网页动起来**，例如响应用户点�
 <body>
     <h1>欢迎来到我的网页</h1>
     <p>这是一个简单的 HTML 页面。</p>
-    <button onclick="sayHello(菜鸟)">点击我</button>
+    <button onclick="sayHello('菜鸟')">点击我</button>
 </body>
 </html>
 
