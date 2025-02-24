@@ -1,5 +1,5 @@
 +++
-title = '前端极简教程 html&css&js 简介'
+title = '前端教程 html&css&js 简介'
 date = 2025-02-17T12:53:20Z
 tags = ['frontend']
 categories = ['Frontend']
