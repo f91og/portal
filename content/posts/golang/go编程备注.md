@@ -1,5 +1,5 @@
 +++
-title = 'Golang 编程备注'
+title = 'go 编程备注'
 date = 2024-11-24T09:04:10Z
 draft = false
 tags = ['go']
@@ -162,6 +162,45 @@ fmt.Println(mypackage.Greet("Alice"))  // 调用独立函数
 **独立函数**：适合处理与特定结构体无关的通用功能，便于复用，适合没有状态管理需求的功能。
 
 ## 通过导入 init 函数来初始化
+可以通过导入另一个包，而另一个包里有 init 函数这样来实现 import 时隐式来执行一些初始化操作，比如数据库操作等。
+如果有多个 init 函数则按照导入顺序，然后是本包中的 init 函数的顺序来执行。
 
-## 如何实现AOP类似的功能
-## 
+## 实现 AOP 来统一处理一些通用的逻辑
+
+最近在写代码的时候，有很多 api endpint 参数验证重复的代码：
+```go
+func handler1(w http.ResponseWriter, r *http.Request) {
+	// .......
+	var req Request
+	validate = validator.New()
+	if err := validate.Struct(req); err != nil {
+		handleResponse(w, r, http.StatusBadRequest, ReturnMessagef("Bad Request: %v", err.Error()))
+		return
+	}
+	//.....
+}
+
+func hanlder2(w http.ResponseWriter, r *http.Request) {
+	// .......
+	var req Request
+	validate = validator.New()
+	if err := validate.Struct(req); err != nil {
+		handleResponse(w, r, http.StatusBadRequest, ReturnMessagef("Bad Request: %v", err.Error()))
+		return
+	}
+	//.....
+}
+```
+这样真的很啰嗦，如果有类似 AOP 的功能来统一处理这种验证就好了。
+
+第一种做法是装饰器模式：
+
+第二种是使用框架自带的中间件，这里以 go-chi 为例：
+
+参考：[go语言怎么实现aop • Worktile社区](https://worktile.com/kb/p/3507723)
+## 后端 APi 应该提供尽可能简单的单个功能
+
+最近在开发 backend api 有感，不知道为什么组里设计了一些比较重的 api，单个 api 里把很多事都做了，其实这些功能完全可以通过前端来 orchestrating APIs 来实现，相对于后端 api，明显前端的构建，测试和改动事更加容易的。
+## 可以使用错误来代替存在检查
+
+如果不存在则返回不存在错误，而不需要额外用 bool 变量，反正 go 写起来有一堆 if err 判断。
