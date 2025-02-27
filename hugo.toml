@@ -4,7 +4,6 @@ theme = 'maupassant'
 googleAnalytics = "GA ID"
 defaultContentLanguage = "zh-hans"
 # defaultContentLanguageInSubdir = true # 多语言支持，开启了后可以通过 /zh/ 或 /en/ 访问不同语言版本
-canonifyURLs = true
 
 [params]
   subtitle = '万物は、天にあるものも地にあるものも、見えるものも見えないものも、位も、主権も、支配も、権威も、すべで御子の中で創造されたからです'
