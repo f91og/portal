@@ -1,0 +1,1 @@
+My personal blog edited by Obsidian, should open `portal/content/posts` as vault folder in Obsidian, folder `.obsidain` should also be uploaed to the repo, this can keep installed plugins&styles in previous devices
