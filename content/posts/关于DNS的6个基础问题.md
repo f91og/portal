@@ -1,5 +1,5 @@
 +++
-title = ' 关于 DNS 的 5 个基础问题 '
+title = ' 关于 DNS 的 6 个基础问题 '
 date = 2024-05-01
 draft = false
 toc = false
