@@ -17,7 +17,7 @@ draft = false
 
 关于在线特征平台：在线特征平台就是把模型或业务需要的“关键数据”整理好，放进一个可以低延迟（<10ms）查询的数据库里，让线上系统（推荐/风控/广告/个性化）能在几毫秒内拿到特征数据（最近 30 天点击次数， 商品热度，用户平均浏览价格，风控需要的最近 N 次付款行为等）。
 
-公司的在线特征平台的基本设计就是将 bigquery 的数据导入到 bigtable 里并用 go 来开发了一个特征数据的获得 api，这样推荐系统可以直接通过这个 api 来拿到特征数据，一些要点：
+公司的在线特征平台的基本设计就是将 bigquery 的数据导入到 bigtable 里并用 go 来开发了一个特征数据 serving 层，推荐系统可以通过 serving 层的 api 来拿到特征数据：
 - 整个系统由 Go（Serving）、Python（Orchestration）、Java Beam（Dataflow）和 GCP 服务协同构成
 - 数据流 BigQuery → Dataflow Job → Bigtable
 - 事件驱动来 ETL 调度，Flask API 会在收到某些请求（或按 schedule）时 **publish 一个 Pub/Sub message**, 后台的 worker/subscriber 会订阅特定 topic 来触发 dataflow job，这样不需要通过 cronjob 或者手动来，更加灵活
@@ -54,6 +54,24 @@ data platform 的 infra 基本就是 cdc tool -> kafka -> spark ->hive metastore
 - airflow 作为 job 调度工具，上游 team 需要作每日报表这样的任务时通过 airflow 触发 job 来用 hudi 中的数据来生成报表
 - 后来 leader 决定迁移到 AWS GLUE + lambda，觉得 serverless 会减少 platform 运维成本，提提高自动化，后来证明 leader 想多了，大数据量的场景下明显 serverless 不太适合，光 spark 版本问题就等 AWS 的人来解决好久，更别说 serverless 自带可能的延迟，debug 困难和参数调优受限了
 
+AWS Lambda + Glue Metastore 可以把“本来要人手维护的元数据操作”自动化、事件化、服务化，AWS Glue Data Catalog ≈ **Hive Metastore（托管版）**，存放数据的原信息，比如表在 S3 中的路径，当 Spark / Flink 作业往 S3 写了新数据，让 Lambda 检查 Glue 里是否已有 table，没有就 `CreateTable`，有就 UpdateTable
+```shell
+ETL / Streaming Job
+  └─ 写 S3（Parquet/ORC）
+
+S3 Event / Schedule / API Call
+  └─ EventBridge
+      └─ Lambda
+          ├─ 校验 schema
+          ├─ Create/Update Glue Table
+          ├─ Register Partitions
+          └─ Emit Metrics / Logs
+
+Query Engine
+  └─ Athena / Presto / Spark SQL
+      └─ 读 Glue Metastore
+```
+
 Hudi 的作用是在对象存储（S3）上实现“可更新的数据湖”（包括 upsert、删除、增量读、事务一致性、表时间线管理），没有 Hudi，数据湖只能 append，不能可靠地更新
 - 数据从 Canal/Kafka 来，是每天/每小时/实时都在发生变更的
 - 对已有行做更新/覆盖，即 upsert
@@ -80,4 +98,4 @@ Hudi 的作用是在对象存储（S3）上实现“可更新的数据湖”（�
 
 ## 总结
 
-基本要做的就是数据搬运工的角色吧，包括数据清洗和 job 调度，以及对不同 db 的掌握。
+	基本要做的就是数据搬运工的角色吧，包括数据清洗和 job 调度，以及对不同 db 的掌握。
